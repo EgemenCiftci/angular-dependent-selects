@@ -25,8 +25,8 @@ export class App implements OnInit {
   private initialized = false;
   private readonly defaultFruitTypeId = 2; // Default to 'Sour' type
   private readonly defaultFruitIds = [3, 4]; // Default fruits: Lemon and Grapefruit
-  fruitTypes = new BehaviorSubject<FruitType[]>([]);
-  fruits = new BehaviorSubject<Fruit[]>([]);
+  fruitTypes$ = new BehaviorSubject<FruitType[]>([]);
+  fruits$ = new BehaviorSubject<Fruit[]>([]);
 
   formGroup = new FormGroup({
     fruitType: new FormControl<FruitType | null>(null),
@@ -54,7 +54,7 @@ export class App implements OnInit {
 
   private async initializeData() {
     const types = await this.appService.getFruitTypes();
-    this.fruitTypes.next(types);
+    this.fruitTypes$.next(types);
 
     // Subscribe to query params
     this.route.queryParams.subscribe(async params => {
@@ -62,11 +62,11 @@ export class App implements OnInit {
       let typeId = Number(params['type']) || this.defaultFruitTypeId;
 
       // Find the fruit type (either from URL or default)
-      const fruitType = this.fruitTypes.value.find(ft => ft.id === typeId);
+      const fruitType = this.fruitTypes$.value.find(ft => ft.id === typeId);
       if (fruitType) {
         this.formGroup.controls.fruitType.setValue(fruitType, { emitEvent: false });
         const fruits = await this.appService.getFruitsByType(fruitType.id);
-        this.fruits.next(fruits);
+        this.fruits$.next(fruits);
         shouldCallApi = true;
 
         // Handle fruit selection (from URL or default)
@@ -103,7 +103,7 @@ export class App implements OnInit {
     this.formGroup.controls.fruitType.valueChanges.subscribe(async fruitType => {
       if (fruitType) {
         const fruits = await this.appService.getFruitsByType(fruitType.id);
-        this.fruits.next(fruits);
+        this.fruits$.next(fruits);
         this.formGroup.controls.fruit.setValue([], { emitEvent: false }); // Prevent fruit selection from triggering
         await this.appService.saveItems(fruitType, []); // Call API here with empty selection
         this.updateQueryParams(); // Update URL when fruit type changes
