@@ -1,11 +1,11 @@
 <form [formGroup]="formGroup">
-    <select formControlName="fruitType">
-        @for(fruitType of fruitTypes(); track fruitType.id) {
+        <select formControlName="fruitType">
+        @for(fruitType of fruitTypes | async; track fruitType.id) {
         <option [ngValue]="fruitType">{{ fruitType.name }}</option>
         }
     </select>
     <select formControlName="fruit" multiple>
-        @for(fruit of fruits(); track fruit.id) {
+        @for(fruit of fruits | async; track fruit.id) {
         <option [ngValue]="fruit">{{ fruit.name }}</option>
         }
     </select>

@@ -31,12 +31,17 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 - Automatic URL updates on selection changes
 
 ### API Integration
-- Simulated API calls with 500ms delay
-- Calls made on:
+- Service-based architecture with AppService
+- Simulated API methods with configurable delay (default: 500ms):
+  - getFruitTypes(): Fetches all fruit type categories
+  - getFruitsByType(typeId): Retrieves fruits filtered by type
+  - saveItems(fruitType, selectedFruits): Saves current selection
+- Configurable API delay via `API_DELAY_MS` constant in AppService
+- API calls triggered on:
   - Initial load
   - Fruit type changes
   - Fruit selection changes
-- Console logging of selections
+- Console logging of selections with detailed output
 
 ## Development server
 
@@ -105,16 +110,19 @@ Example URL: `http://localhost:4200/?type=2&fruits=3,4`
 ## Implementation Details
 
 The project uses:
-- Angular Signals for state management
+- BehaviorSubject for state management
 - ReactiveFormsModule for form handling
 - Router for URL parameter management
 - TypeScript interfaces for type safety
-- Simulated API calls with Promise/async-await
+- Simulated API calls with Promise/async-await and configurable delays
+- Service architecture with dependency injection
+- Centralized API delay configuration for consistent simulation timing
 
 ## Additional Resources
 
 For more information:
 - [Angular Reactive Forms](https://angular.dev/guide/forms/reactive-forms)
-- [Angular Signals](https://angular.dev/guide/signals)
+- [Angular Services](https://angular.dev/guide/dependency-injection)
 - [Angular Router](https://angular.dev/guide/routing)
 - [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli)
+- [RxJS BehaviorSubject](https://rxjs.dev/api/behavior/BehaviorSubject)
