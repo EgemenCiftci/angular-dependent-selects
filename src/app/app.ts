@@ -29,8 +29,8 @@ export class App implements OnInit {
   fruits = new BehaviorSubject<Fruit[]>([]);
 
   formGroup = new FormGroup({
-    fruitType: new FormControl<FruitType | null>(this.fruitTypes.value.find(ft => ft.id === this.defaultFruitTypeId) || null),
-    fruit: new FormControl<Fruit[]>(this.fruits.value.filter(f => this.defaultFruitIds.includes(f.id)))
+    fruitType: new FormControl<FruitType | null>(null),
+    fruit: new FormControl<Fruit[]>([])
   });
 
   private updateQueryParams() {
@@ -59,32 +59,37 @@ export class App implements OnInit {
     // Subscribe to query params
     this.route.queryParams.subscribe(async params => {
       let shouldCallApi = false;
+      let typeId = Number(params['type']) || this.defaultFruitTypeId;
 
-      if (params['type']) {
-        const typeId = Number(params['type']);
-        const fruitType = this.fruitTypes.value.find(ft => ft.id === typeId);
-        if (fruitType) {
-          this.formGroup.controls.fruitType.setValue(fruitType, { emitEvent: false });
-          const fruits = await this.appService.getFruitsByType(fruitType.id);
-          this.fruits.next(fruits);
-          shouldCallApi = true;
+      // Find the fruit type (either from URL or default)
+      const fruitType = this.fruitTypes.value.find(ft => ft.id === typeId);
+      if (fruitType) {
+        this.formGroup.controls.fruitType.setValue(fruitType, { emitEvent: false });
+        const fruits = await this.appService.getFruitsByType(fruitType.id);
+        this.fruits.next(fruits);
+        shouldCallApi = true;
+
+        // Handle fruit selection (from URL or default)
+        if (params['fruits']) {
+          const fruitIds = new Set(params['fruits'].split(',').map(Number));
+          const selectedFruits = fruits.filter(f => fruitIds.has(f.id));
+          this.formGroup.controls.fruit.setValue(selectedFruits, { emitEvent: false });
+        } else if (!params['type']) {
+          // Only set default fruits if there was no type in URL
+          const defaultFruits = fruits.filter(f => this.defaultFruitIds.includes(f.id));
+          this.formGroup.controls.fruit.setValue(defaultFruits, { emitEvent: false });
         }
-      }
 
-      if (params['fruits']) {
-        const fruitIds = new Set(params['fruits'].split(',').map(Number));
-        const selectedFruits = this.fruits.value.filter(f => fruitIds.has(f.id));
-        this.formGroup.controls.fruit.setValue(selectedFruits, { emitEvent: false });
-      }
-
-      // Make initial API call only if this is page load
-      if (shouldCallApi && !this.initialized) {
-        const fruitType = this.formGroup.controls.fruitType.value;
-        const selectedFruits = this.formGroup.controls.fruit.value;
-        if (fruitType) {
+        // Make initial API call only if this is page load
+        if (shouldCallApi && !this.initialized) {
+          const selectedFruits = this.formGroup.controls.fruit.value;
           await this.appService.saveItems(fruitType, selectedFruits || []);
+          this.initialized = true;
+          if (!params['type']) {
+            // Update URL with defaults if no parameters were provided
+            this.updateQueryParams();
+          }
         }
-        this.initialized = true;
       }
     });
   }

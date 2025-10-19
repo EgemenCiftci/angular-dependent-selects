@@ -14,15 +14,17 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 
 ### Fruit Type Selection
 - Single select dropdown
-- Four categories: Sweet, Sour, Salty, and Bitter
-- Default selection: "Sour"
-- Changes trigger fruit list update
+- Four categories: Sweet (id: 1), Sour (id: 2), Salty (id: 3), and Bitter (id: 4)
+- Default selection: "Sour" (id: 2)
+- Changes trigger fruit list update and clear fruit selection
 
 ### Fruit Selection
 - Multi-select dropdown
 - Dynamic options based on selected fruit type
+- Default selection for "Sour": Lemon (id: 3) and Grapefruit (id: 4)
 - Selection preserved in URL parameters
 - Multiple fruits can be selected simultaneously
+- Selection cleared when fruit type changes
 
 ### URL Integration
 - State preserved in URL query parameters
@@ -97,11 +99,20 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 
 ## Usage Example
 
-1. Select a fruit type (e.g., "Sour")
-2. Available fruits will update automatically
-3. Select multiple fruits using Ctrl/Cmd + click
-4. Notice URL updates with your selections
-5. Share the URL to preserve your selections
+1. On initial load:
+   - "Sour" fruit type is automatically selected
+   - "Lemon" and "Grapefruit" are pre-selected
+   - URL updates to reflect default selections
+2. Select a different fruit type:
+   - Available fruits update automatically
+   - Previous fruit selection is cleared
+   - URL updates to show new type and empty selection
+3. Select multiple fruits using Ctrl/Cmd + click:
+   - Each selection triggers an API call
+   - URL updates to reflect current selections
+4. Share the URL to preserve your selections:
+   - Opening the URL restores both fruit type and selections
+   - Default values only apply when no URL parameters exist
 
 Example URL: `http://localhost:4200/?type=2&fruits=3,4`
 - `type=2` represents "Sour" category
